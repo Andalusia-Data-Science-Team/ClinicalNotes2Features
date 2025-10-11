@@ -3,6 +3,8 @@ This project focuses on transforming unstructured clinical notes into structured
 
 # We Can Extract this in 2 ways 
  
-![alt text](image.png)
+![alt text](assets/image.png)
 
-![alt text](image-1.png)
+![alt text](assets/image-1.png)
+
+
