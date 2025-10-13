@@ -97,7 +97,7 @@ notes_column = st.sidebar.text_input(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 **Tip:** Smaller batch sizes (3-5) work better for complex notes")
+st.sidebar.info("💡 **Tip:** Smaller batch sizes (3-5) work better for complex clinical notes")
 
 # Main content
 st.header("📤 Upload Your Data")
@@ -113,9 +113,9 @@ with st.expander("📋 View Sample Input Format"):
     sample_data = {
         "Patient_ID": ["P001", "P002", "P003"],
         "Notes": [
-            "Meropenem 2 grams q8h IV infusion over 3 hours. Send VBG. NGT feeding as tolerated. Monitor BP.",
-            "Sodium Bicarbonate 200 mL IV stat. No position of the patient till doctor order.",
-            "1 PRBC to be given over HD session. Send VBG. Monitor labs."
+            "CC: Chest pain. HPI: 65yo male presents with crushing substernal chest pain x 2 hours, radiating to left arm. PMH: HTN, DM. Medications: Metformin 500mg BID, Lisinopril 10mg daily. PE: BP 160/90, HR 110. Assessment: STEMI. Plan: Aspirin 325mg stat, cath lab activation.",
+            "Chief complaint: Shortness of breath for 3 days. Past history of COPD. Currently on albuterol inhaler PRN. Physical exam shows decreased breath sounds bilaterally. Plan: Increase bronchodilator therapy, pulmonology follow-up.",
+            "Patient complains of abdominal pain. ROS: GI - nausea, vomiting; GU - dysuria. Allergies: Sulfa drugs - Stevens-Johnson syndrome. Assessment: UTI vs gastroenteritis. Plan: UA and culture, ciprofloxacin 500mg BID x 7 days."
         ]
     }
     st.dataframe(pd.DataFrame(sample_data), use_container_width=True)
@@ -185,7 +185,7 @@ if uploaded_file is not None:
                         st.caption(f"Showing all {len(result_df)} extracted records")
                     
                     with tab2:
-                        # Statistics
+                        # Statistics - Updated for clinical note structure
                         st.markdown("### 📈 Extraction Statistics")
                         
                         col1, col2, col3, col4 = st.columns(4)
@@ -198,58 +198,89 @@ if uploaded_file is not None:
                             )
                         
                         with col2:
-                            medications = sum(1 for item in structured_data if item.get("Medication_Name") and item.get("Medication_Name").strip())
+                            chief_complaints = sum(1 for item in structured_data if item.get("Chief_Complaint") and item.get("Chief_Complaint").strip())
                             st.metric(
-                                "Medications Found", 
-                                medications,
-                                delta=f"{(medications/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
-                                help="Number of notes with medication information"
+                                "Chief Complaints", 
+                                chief_complaints,
+                                delta=f"{(chief_complaints/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
+                                help="Number of notes with chief complaint information"
                             )
                         
                         with col3:
-                            procedures = sum(1 for item in structured_data if item.get("Procedure_Type") and item.get("Procedure_Type").strip())
+                            hpi = sum(1 for item in structured_data if item.get("History_Present_Illness") and item.get("History_Present_Illness").strip())
                             st.metric(
-                                "Procedures Found", 
-                                procedures,
-                                delta=f"{(procedures/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
-                                help="Number of notes with procedure information"
+                                "History Present Illness", 
+                                hpi,
+                                delta=f"{(hpi/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
+                                help="Number of notes with HPI information"
                             )
                         
                         with col4:
-                            labs = sum(1 for item in structured_data if item.get("Lab_Test_Name") and item.get("Lab_Test_Name").strip())
+                            pmh = sum(1 for item in structured_data if item.get("Past_Medical_History") and item.get("Past_Medical_History").strip())
                             st.metric(
-                                "Lab Tests Found", 
-                                labs,
-                                delta=f"{(labs/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
-                                help="Number of notes with lab test information"
+                                "Past Medical History", 
+                                pmh,
+                                delta=f"{(pmh/len(notes)*100):.1f}%" if len(notes) > 0 else "0%",
+                                help="Number of notes with past medical history"
                             )
                         
-                        # Additional statistics
+                        # Additional statistics - Row 2
                         st.markdown("---")
                         col5, col6, col7, col8 = st.columns(4)
                         
                         with col5:
-                            feeding = sum(1 for item in structured_data if item.get("Feeding_Type") and item.get("Feeding_Type").strip())
-                            st.metric("Feeding Instructions", feeding)
+                            medications = sum(1 for item in structured_data if item.get("Current_Medications") and item.get("Current_Medications").strip())
+                            st.metric("Current Medications", medications)
                         
                         with col6:
-                            vitals = sum(1 for item in structured_data if item.get("Vital_Sign") and item.get("Vital_Sign").strip())
-                            st.metric("Vital Signs", vitals)
+                            allergies = sum(1 for item in structured_data if item.get("Allergies") and item.get("Allergies").strip())
+                            st.metric("Allergies", allergies)
                         
                         with col7:
-                            instructions = sum(1 for item in structured_data if item.get("Instruction") and item.get("Instruction").strip())
-                            st.metric("Special Instructions", instructions)
+                            physical_exam = sum(1 for item in structured_data if item.get("Physical_Exam") and item.get("Physical_Exam").strip())
+                            st.metric("Physical Exams", physical_exam)
                         
                         with col8:
-                            sessions = sum(1 for item in structured_data if item.get("Session_Context") and item.get("Session_Context").strip())
-                            st.metric("Session Contexts", sessions)
+                            ros = sum(1 for item in structured_data if item.get("Review_of_Systems") and item.get("Review_of_Systems").strip())
+                            st.metric("Review of Systems", ros)
+                        
+                        # Additional statistics - Row 3
+                        st.markdown("---")
+                        col9, col10, col11 = st.columns(3)
+                        
+                        with col9:
+                            labs = sum(1 for item in structured_data if item.get("Labs_Imaging_Results") and item.get("Labs_Imaging_Results").strip())
+                            st.metric("Labs/Imaging", labs)
+                        
+                        with col10:
+                            assessment = sum(1 for item in structured_data if item.get("Assessment_Impression") and item.get("Assessment_Impression").strip())
+                            st.metric("Assessment/Impression", assessment)
+                        
+                        with col11:
+                            plan = sum(1 for item in structured_data if item.get("Plan") and item.get("Plan").strip())
+                            st.metric("Treatment Plans", plan)
                         
                         # Field completion chart
                         st.markdown("### 📊 Field Completion Rate")
                         field_completion = {}
+                        field_labels = {
+                            "Chief_Complaint": "Chief Complaint",
+                            "History_Present_Illness": "History Present Illness", 
+                            "Past_Medical_History": "Past Medical History",
+                            "Current_Medications": "Current Medications",
+                            "Allergies": "Allergies",
+                            "Physical_Exam": "Physical Exam",
+                            "Review_of_Systems": "Review of Systems",
+                            "Labs_Imaging_Results": "Labs/Imaging Results",
+                            "Assessment_Impression": "Assessment/Impression",
+                            "Plan": "Treatment Plan"
+                        }
+                        
                         for field in result_df.columns:
                             non_empty = sum(1 for val in result_df[field] if val and str(val).strip())
-                            field_completion[field] = (non_empty / len(result_df) * 100) if len(result_df) > 0 else 0
+                            completion_rate = (non_empty / len(result_df) * 100) if len(result_df) > 0 else 0
+                            field_name = field_labels.get(field, field)
+                            field_completion[field_name] = completion_rate
                         
                         completion_df = pd.DataFrame({
                             'Field': list(field_completion.keys()),
@@ -268,7 +299,13 @@ if uploaded_file is not None:
                                     st.info(notes[i])
                                 with col_b:
                                     st.markdown("**Extracted Features:**")
-                                    st.json(structured_data[i])
+                                    
+                                    # Display extracted features in a more readable format
+                                    extracted = structured_data[i]
+                                    for field, value in extracted.items():
+                                        if value and str(value).strip():
+                                            field_name = field_labels.get(field, field)
+                                            st.markdown(f"**{field_name}:** {value}")
                     
                     progress_bar.progress(95)
                     
@@ -287,7 +324,7 @@ if uploaded_file is not None:
                         st.download_button(
                             label="📥 Download Structured Features (Excel)",
                             data=excel_data,
-                            file_name=f"structured_features_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+                            file_name=f"clinical_features_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             use_container_width=True
                         )
@@ -297,13 +334,13 @@ if uploaded_file is not None:
                         st.download_button(
                             label="📥 Download as CSV",
                             data=csv_data,
-                            file_name=f"structured_features_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                            file_name=f"clinical_features_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv",
                             mime="text/csv",
                             use_container_width=True
                         )
                     
                     # Success message
-                    st.success("🎉 Feature extraction completed successfully!")
+                    st.success("🎉 Clinical feature extraction completed successfully!")
                     
                 except Exception as e:
                     st.error(f"❌ Error during extraction: {str(e)}")
@@ -331,9 +368,14 @@ else:
     with col1:
         st.markdown("""
         **1️⃣ Prepare Your Data**
-        - Create an Excel file
-        - Add clinical notes in a column
-        - Name the column (e.g., "Notes")
+        - Create an Excel file with clinical notes
+        - Include standard clinical sections:
+          - Chief Complaint
+          - History of Present Illness
+          - Past Medical History
+          - Current Medications
+          - Physical Exam findings
+          - Assessment & Plan
         """)
     
     with col2:
@@ -342,6 +384,7 @@ else:
         - Enter your Fireworks AI API key
         - Select your preferred model
         - Adjust batch size if needed
+        - Specify the notes column name
         """)
     
     with col3:
@@ -349,7 +392,34 @@ else:
         **3️⃣ Extract Features**
         - Upload your Excel file
         - Click "Extract Structured Features"
-        - Download the results
+        - Review the extracted clinical components
+        - Download structured results
+        """)
+    
+    # Feature explanation
+    st.markdown("---")
+    st.markdown("### 🏥 Extracted Clinical Features")
+    
+    feature_cols = st.columns(2)
+    
+    with feature_cols[0]:
+        st.markdown("""
+        **📋 Primary Components:**
+        - **Chief Complaint:** Main reason for visit
+        - **History Present Illness:** Detailed symptom description
+        - **Past Medical History:** Previous conditions/surgeries
+        - **Current Medications:** Active medications
+        - **Allergies:** Known allergies and reactions
+        """)
+    
+    with feature_cols[1]:
+        st.markdown("""
+        **🔍 Clinical Assessment:**
+        - **Physical Exam:** Examination findings
+        - **Review of Systems:** Symptom inventory
+        - **Labs/Imaging:** Diagnostic test results
+        - **Assessment:** Working diagnoses
+        - **Plan:** Treatment recommendations
         """)
 
 # Footer
@@ -357,9 +427,9 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
     <p><strong>🏥 ClinicalNotes2Features</strong> | Powered by Fireworks AI & Llama Models</p>
-    <p style='font-size: 0.9rem;'>Transform unstructured clinical notes into actionable structured data</p>
+    <p style='font-size: 0.9rem;'>Transform unstructured clinical notes into structured clinical components</p>
     <p style='font-size: 0.8rem; margin-top: 1rem;'>
-        Built for healthcare data analysis and machine learning applications
+        Built for healthcare data analysis, EMR integration, and clinical research
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -372,6 +442,7 @@ st.sidebar.markdown("""
 - [Get API Key](https://fireworks.ai/)
 
 ### ℹ️ About
-Version: 1.0.0  
+Version: 2.0.0  
+Clinical Note Structure Extraction  
 Built with Streamlit & Fireworks AI
 """)

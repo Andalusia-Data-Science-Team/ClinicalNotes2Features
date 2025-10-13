@@ -6,11 +6,12 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment
 
 
-# Centralized field definitions (matches prompts.py - removed "Timing")
+# Centralized field definitions (matches prompts.py - updated to clinical note structure)
 REQUIRED_FIELDS = [
-    "Medication_Name", "Dosage", "Route", "Frequency",
-    "Procedure_Type", "Lab_Test_Name", "Feeding_Type",
-    "Feeding_Status", "Vital_Sign", "Instruction", "Session_Context"
+    "Chief_Complaint", "History_Present_Illness", "Past_Medical_History",
+    "Current_Medications", "Allergies", "Physical_Exam",
+    "Review_of_Systems", "Labs_Imaging_Results", 
+    "Assessment_Impression", "Plan"
 ]
 
 
@@ -234,12 +235,12 @@ def validate_structured_data(data: List[Dict], verbose: bool = False) -> bool:
     Returns:
         Boolean indicating if data is valid
     """
-    # FIXED: Removed "Timing" field to match prompts.py
+    # Updated to match new clinical note structure
     required_fields = [
-        "Medication_Name", "Dosage", "Route", "Frequency",
-        "Procedure_Type", "Lab_Test_Name", "Feeding_Type",
-        "Feeding_Status", "Vital_Sign",
-        "Instruction", "Session_Context"
+        "Chief_Complaint", "History_Present_Illness", "Past_Medical_History",
+        "Current_Medications", "Allergies", "Physical_Exam",
+        "Review_of_Systems", "Labs_Imaging_Results", 
+        "Assessment_Impression", "Plan"
     ]
     
     # Check if data exists
@@ -328,7 +329,7 @@ def get_data_summary(data: List[Dict]) -> Dict:
         count = sum(1 for item in data if item.get(field) and str(item.get(field)).strip())
         fields_populated[field] = {
             "count": count,
-            "percentage": round((count / total_records * 100), 2)  # FIXED: Added rounding
+            "percentage": round((count / total_records * 100), 2)
         }
     
     # Calculate overall completion rate

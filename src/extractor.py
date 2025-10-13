@@ -245,12 +245,12 @@ class ClinicalNotesExtractor:
         Returns:
             Boolean indicating if it's a valid structure
         """
-        # Updated to match prompts.py - removed "Timing"
+        # Updated to match new clinical note structure
         expected_fields = {
-            "Medication_Name", "Dosage", "Route", "Frequency",
-            "Procedure_Type", "Lab_Test_Name", "Feeding_Type",
-            "Feeding_Status", "Vital_Sign",
-            "Instruction", "Session_Context"
+            "Chief_Complaint", "History_Present_Illness", "Past_Medical_History",
+            "Current_Medications", "Allergies", "Physical_Exam",
+            "Review_of_Systems", "Labs_Imaging_Results", 
+            "Assessment_Impression", "Plan"
         }
         obj_fields = set(obj.keys())
         # Check if at least half of expected fields are present
@@ -263,19 +263,18 @@ class ClinicalNotesExtractor:
         Returns:
             Empty structured dictionary
         """
-        # Updated to match prompts.py - removed "Timing"
+        # Updated to match new clinical note structure
         return {
-            "Medication_Name": "",
-            "Dosage": "",
-            "Route": "",
-            "Frequency": "",
-            "Procedure_Type": "",
-            "Lab_Test_Name": "",
-            "Feeding_Type": "",
-            "Feeding_Status": "",
-            "Vital_Sign": "",
-            "Instruction": "",
-            "Session_Context": ""
+            "Chief_Complaint": "",
+            "History_Present_Illness": "",
+            "Past_Medical_History": "",
+            "Current_Medications": "",
+            "Allergies": "",
+            "Physical_Exam": "",
+            "Review_of_Systems": "",
+            "Labs_Imaging_Results": "",
+            "Assessment_Impression": "",
+            "Plan": ""
         }
     
     def _get_empty_structures(self, count: int) -> List[Dict]:
