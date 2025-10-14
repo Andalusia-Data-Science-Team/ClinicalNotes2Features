@@ -56,8 +56,7 @@ api_key = st.sidebar.text_input(
 
 # Model selection
 available_models = {
-    "Llama 4 Scout Instruct (Basic)": "accounts/fireworks/models/llama4-maverick-instruct-basic",
-    "Llama 3.3 70B Instruct": "accounts/fireworks/models/llama-v3p3-70b-instruct",
+    "Llama 4 maverick Instruct (Basic)": "accounts/fireworks/models/llama4-maverick-instruct-basic",
     "Llama 3.1 405B Instruct": "accounts/fireworks/models/llama-v3p1-405b-instruct",
 }
 
