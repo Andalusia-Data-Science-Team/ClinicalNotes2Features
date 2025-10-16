@@ -43,52 +43,16 @@ st.markdown("""
 st.markdown('<p class="main-header">🏥 ClinicalNotes2Features</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Transform unstructured clinical notes into structured features using AI</p>', unsafe_allow_html=True)
 
+# Load configuration from environment variables
+api_key = os.getenv("FIREWORKS_API_KEY")
+model = os.getenv("MODEL", "accounts/fireworks/models/llama4-maverick-instruct-basic")
+temperature = float(os.getenv("TEMPERATURE", "0.0"))
+batch_size = int(os.getenv("BATCH_SIZE", "5"))
+
 # Sidebar for configuration
 st.sidebar.header("⚙️ Configuration")
 
-# API Key input
-api_key = st.sidebar.text_input(
-    "🔑 Fireworks AI API Key",
-    type="password",
-    value=os.getenv("FIREWORKS_API_KEY", ""),
-    help="Enter your Fireworks AI API key"
-)
-
-# Model selection
-available_models = {
-    "Llama 4 maverick Instruct (Basic)": "accounts/fireworks/models/llama4-maverick-instruct-basic",
-    "Llama 3.1 405B Instruct": "accounts/fireworks/models/llama-v3p1-405b-instruct",
-}
-
-model_display_name = st.sidebar.selectbox(
-    "🤖 Select Model",
-    list(available_models.keys()),
-    index=0,
-    help="Choose the Llama model for extraction"
-)
-
-model = available_models[model_display_name]
-
-# Temperature
-temperature = st.sidebar.slider(
-    "🌡️ Temperature",
-    min_value=0.0,
-    max_value=1.0,
-    value=0.0,
-    step=0.1,
-    help="Lower values = more consistent, Higher values = more creative"
-)
-
-# Batch size
-batch_size = st.sidebar.slider(
-    "📦 Batch Size",
-    min_value=1,
-    max_value=20,
-    value=5,
-    help="Number of notes to process at once (smaller batches are more reliable)"
-)
-
-# Notes column name
+# Keep Notes column configuration in UI
 notes_column = st.sidebar.text_input(
     "📋 Notes Column Name",
     value="Notes",
@@ -96,7 +60,24 @@ notes_column = st.sidebar.text_input(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 **Tip:** Smaller batch sizes (3-5) work better for complex clinical notes")
+
+# Show current settings (read-only)
+st.sidebar.info("📋 **Current Settings:**")
+st.sidebar.markdown(f"""
+- **Model:** {model.split('/')[-1] if '/' in model else model}
+- **Temperature:** {temperature}
+- **Batch Size:** {batch_size}
+""")
+
+# Check for API key
+if not api_key:
+    st.sidebar.error("❌ **API Key Missing**")
+    st.sidebar.markdown("Please set `FIREWORKS_API_KEY` in your `.env` file")
+else:
+    st.sidebar.success("✅ **API Key Loaded**")
+
+st.sidebar.markdown("---")
+st.sidebar.info("💡 **Tip:** Model settings are configured via `.env` file")
 
 # Main content
 st.header("📤 Upload Your Data")
@@ -141,7 +122,7 @@ if uploaded_file is not None:
         if st.button("🚀 Extract Structured Features", type="primary", use_container_width=True):
             
             if not api_key:
-                st.error("❌ Please enter your Fireworks AI API key in the sidebar")
+                st.error("❌ Please set FIREWORKS_API_KEY in your .env file")
             else:
                 
                 # Progress tracking
@@ -159,7 +140,8 @@ if uploaded_file is not None:
                     progress_bar.progress(10)
                     
                     # Extract features
-                    status_text.text(f"🔍 Extracting features from {len(notes)} notes using {model_display_name}...")
+                    model_name = model.split('/')[-1] if '/' in model else model
+                    status_text.text(f"🔍 Extracting features from {len(notes)} notes using {model_name}...")
                     structured_data = extractor.extract_batch(notes, batch_size=batch_size)
                     progress_bar.progress(70)
                     
@@ -380,10 +362,10 @@ else:
     with col2:
         st.markdown("""
         **2️⃣ Configure Settings**
-        - Enter your Fireworks AI API key
-        - Select your preferred model
-        - Adjust batch size if needed
-        - Specify the notes column name
+        - Set FIREWORKS_API_KEY in .env file
+        - Configure model in .env file
+        - Adjust batch size if needed in .env
+        - Specify the notes column name in sidebar
         """)
     
     with col3:
@@ -440,8 +422,10 @@ st.sidebar.markdown("""
 - [Fireworks AI Docs](https://docs.fireworks.ai/)
 - [Get API Key](https://fireworks.ai/)
 
-### ℹ️ About
-Version: 2.0.0  
-Clinical Note Structure Extraction  
-Built with Streamlit & Fireworks AI
-""")
+### ⚙️ Configuration
+Model settings from `.env` file:
+- `FIREWORKS_API_KEY`
+- `MODEL`
+- `TEMPERATURE`
+- `BATCH_SIZE`
+                """, unsafe_allow_html=True)
