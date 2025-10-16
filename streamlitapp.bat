@@ -1,6 +1,6 @@
 @echo off
 REM === Activate virtual environment ===
-call venv\Scripts\activate
+call env\Scripts\activate
 
 
 REM === Change directory to project folder ===
