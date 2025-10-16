@@ -97,7 +97,3 @@ ClinicalNotes2Features is a powerful web application that automatically extracts
 
 
 
-
-
-
-
